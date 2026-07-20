@@ -1,0 +1,7 @@
+name = "lightpaper"
+compatibility_date = "2025-06-01"
+
+# Static-assets-only Worker: serve the repo root (index.html) as a website.
+# No Worker script/entrypoint — `wrangler deploy` publishes the static files.
+[assets]
+directory = "./"
