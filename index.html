@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rate — light·Paper 2026-07-19</title>
+<title>Rate — light·Paper 2026-07-21</title>
 <style>
 :root{
   --paper:#E8E8E2;--surface:#F4F3ED;--surface2:#EEEDE6;--ink:#1B1E24;--dim:#5E635D;--faint:#6C6F66;
@@ -166,6 +166,15 @@ button.act.primary{position:relative;overflow:hidden}
 .rrow.first{margin-top:13px;padding-top:11px;border-top:1px dashed var(--line)}
 .rrow .lbl{font-family:var(--mono);font-size:var(--fs-micro);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);width:58px}
 .pips{display:flex;gap:6px}
+.segbar{display:inline-flex;margin:12px 0 2px;border:1.5px solid var(--rule);border-radius:11px;overflow:hidden;max-width:100%}
+.segbar .sv{flex:1;border:0;border-right:1.5px solid var(--rule);background:transparent;color:var(--ink);font-family:var(--mono);font-size:12.5px;font-weight:600;padding:9px 14px;cursor:pointer;transition:background .14s,color .14s,transform .1s;white-space:nowrap}
+.segbar .sv:last-child{border-right:0}
+.segbar .sv:hover:not(.on){background:var(--surface2)}
+.segbar .sv.y.on{background:var(--brand);color:var(--on-brand)}
+.segbar .sv.m.on{background:var(--worth);color:#fff}
+.segbar .sv.n.on{background:var(--softno);color:#fff}
+.segbar .sv:active{transform:scale(.98)}
+@media(max-width:520px){.segbar{width:100%}}
 .pip{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--rule);background:transparent;cursor:pointer;padding:0;font-size:0;transition:background .12s,border-color .12s,transform .14s cubic-bezier(.3,1.5,.5,1)}
 .pip.fill{background:var(--brand);border-color:var(--brand)}
 .hint{font-family:var(--mono);font-size:var(--fs-micro);color:var(--faint)}
@@ -651,7 +660,7 @@ mark{background:color-mix(in srgb,var(--worth) 30%,transparent);color:inherit;bo
  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6"/></symbol>
 </svg>
 <header><div class="head-in">
-  <div class="hd-brand"><span class="brand"><em>light</em>·Paper</span><span class="sub">read less, know more &middot; 2026-07-19</span></div>
+  <div class="hd-brand"><span class="brand"><em>light</em>·Paper</span><span class="sub">read less, know more &middot; 2026-07-21</span></div>
   <div class="hsearch-wrap"><label class="hsearch"><span class="mag">🔍</span><input id="hsearch" type="search" placeholder="search papers — title · journal · abstract" oninput="doSearch(this.value)" autocomplete="off" spellcheck="false"><button type="button" class="hsx" id="hsx" onclick="clearSearch()" aria-label="clear search" tabindex="-1">✕</button></label></div>
   <div class="tools">
     <div class="subring-wrap">
@@ -686,7 +695,7 @@ const PATCH = {negatives:{add:[],disable:[],enable:[]},
                pool:{enable:[],disable:[],add_keywords:[]}, bank:{remove:[],add:[]}};
 const SAVED = new Set();            // reading queue -> BibTeX export
 const main = document.getElementById('main');
-const TODAY = "2026-07-19";
+const TODAY = "2026-07-21";
 const SERVED = (location.hostname==='localhost'||location.hostname==='127.0.0.1');   // true ONLY on the serve_inbox localhost page; false on the claude.ai artifact preview or a file:// open
 const LSKEY = 'dp_draft_' + MODE + '_' + TODAY;        // per-digest local draft — survives reload/sleep; ONLY Submit uploads
 let dirty = false, everSubmitted = false, _saveT = null;
@@ -965,7 +974,7 @@ function cardHTML(i,p){
       `<div class="meta">${ven} · ${p.date}${p.project?(' · <span class="proj">'+esc(p.project)+'</span>'):''}${rb}</div>`+
     `</div><div class="cright"><div class="cright-actions">${sv}<button class="cardmenu" onclick="cardMenu(this,${i})" title="more actions" aria-label="more actions">⋯</button></div>${meter}</div></div>`+
     ab+ chipsHTML(i,p)+
-    ((MODE==='nearmiss'||p.nm) ? verdictRow(i) : `<div class="ratebar">`+row(i,'interest','Interest')+row(i,'match','Match')+`</div>`)+
+    ((MODE==='nearmiss'||p.nm) ? verdictRow(i) : segBar(i))+
     `<label class="flabel"><input class="note" data-i="${i}" oninput="setNote(this)" placeholder=" "><span class="fll">note — anything else the agent needs to know: paper, taste, confusion, topics, yourself, etc.</span><span class="ul"></span></label>`;
 }
 // build card elements once (detached); layout() places/re-places them — moving nodes preserves rating state
@@ -989,7 +998,8 @@ main.appendChild(chEl); main.appendChild(wmEl); main.appendChild(vbEl); main.app
 zone.addEventListener('mousemove',e=>{const c=e.target.closest('.card'); if(!c)return; const r=c.getBoundingClientRect(); c.style.setProperty('--mx',(e.clientX-r.left)+'px'); c.style.setProperty('--my',(e.clientY-r.top)+'px');});   // #15 spotlight
 zone.addEventListener('click',e=>{const chip=e.target.closest('.chip'); if(!chip)return; const r=chip.getBoundingClientRect(); const s=document.createElement('span'); s.className='ripple'; s.style.left=(e.clientX-r.left)+'px'; s.style.top=(e.clientY-r.top)+'px'; chip.appendChild(s); setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s);},520);});   // #17 ripple
 const VIEW={filter:'all', group:'tier', sort:'default', sortDir:'desc', page:0,
-            density:(localStorage.getItem('dp_dense')==='1'?'compact':'comfy'), kw:null, search:''};
+            density:(localStorage.getItem('dp_dense')==='1'?'compact':'comfy'), kw:null, search:'', datef:'all'};
+const _refDate=PAPERS.reduce((m,p)=>(p.date&&p.date>m)?p.date:m,'');
 if(VIEW.density==='compact') main.classList.add('dense');
 let _spyIO=null, _dialIO=null, _lastPending=0;   // declared before first layout() (used by wireScrollspy/refreshDials/updSubmit) — avoids TDZ
 let _vbLastY=0, _vbTick=false;   // declared before first buildViewbar() (used by onScrollViewbar) — avoids TDZ
@@ -1001,7 +1011,7 @@ renderTaste();   // taste panel now lives inside Settings ▸ Your taste
 renderAccount(); // Account tab: passport (D1) + keyword constellation (D6)
 renderBalance(); // Experimental tab: Signal ⚖ Noise balance (D5)
 if(MODE==='nearmiss'){
-  document.querySelector('header .sub').textContent='2026-07-19 · papers the cutoff nearly surfaced — mark should-have vs correctly-dropped';
+  document.querySelector('header .sub').textContent='2026-07-21 · papers the cutoff nearly surfaced — mark should-have vs correctly-dropped';
   document.getElementById('count').textContent='0 judged';}
 paintRestored();   // reflect any restored local draft in the freshly-built DOM
 applyVis();        // apply persisted panel/section visibility
@@ -1033,6 +1043,16 @@ function set(el){const grp=el.parentNode, i=+grp.dataset.i, dim=grp.dataset.d, v
   el.style.transform='scale(1.32)'; setTimeout(()=>{el.style.transform='';},140);        // #2 pop
   setTimeout(()=>{[...grp.children].forEach(b=>b.style.transitionDelay='');},320);
   const r=R[PAPERS[i].id]; document.getElementById('c'+i).classList.toggle('rated', r.interest>1||r.match>1||!!(r.note&&r.note.trim())); updCount(); markDirty();}
+function segBar(i){ const r=R[PAPERS[i].id], cur=(r&&r.interest===r.match)?r.interest:0;
+  return `<div class="segbar" data-i="${i}" role="radiogroup" aria-label="rating">`+
+    `<button type="button" class="sv y${cur===5?' on':''}" data-v="5" role="radio" aria-checked="${cur===5}" onclick="segVote(this)">Interested</button>`+
+    `<button type="button" class="sv m${cur===3?' on':''}" data-v="3" role="radio" aria-checked="${cur===3}" onclick="segVote(this)">Maybe</button>`+
+    `<button type="button" class="sv n${cur===2?' on':''}" data-v="2" role="radio" aria-checked="${cur===2}" onclick="segVote(this)">Not for me</button></div>`; }
+function segVote(el){ const grp=el.parentNode, i=+grp.dataset.i, v=+el.dataset.v, r=R[PAPERS[i].id];
+  r.interest=v; r.match=v;                                    // 3-way: Interested=5 · Maybe=3 · Not=2 (mirror deck)
+  [...grp.children].forEach(b=>{const on=(+b.dataset.v===v); b.classList.toggle('on',on); b.setAttribute('aria-checked',on?'true':'false');});
+  el.style.transform='scale(1.04)'; setTimeout(()=>{el.style.transform='';},140);
+  document.getElementById('c'+i).classList.toggle('rated', r.interest>1||r.match>1||!!(r.note&&r.note.trim())); updCount(); markDirty(); }
 function updCount(){const n = Object.values(R).filter(x=>('verdict' in x)?(x.verdict||(x.note&&x.note.trim())):(x.interest>1||x.match>1||(x.note&&x.note.trim()))).length;
   const c=document.getElementById('count'); if(c) c.textContent = n;   // ring centre = rated count
   const b=document.getElementById('subbtn'); if(b) b.setAttribute('aria-label', n+(MODE==='nearmiss'?' judged':' rated')+' — submit feedback');
@@ -1043,8 +1063,8 @@ function nearLines(){const ts=new Date().toISOString();
 function dlNear(){const body=nearLines();
   if(!body){toast('Judge at least one paper first (should have / correctly dropped)'); return;}
   const blob=new Blob([body+'\n'],{type:'application/x-ndjson'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nearmiss_'+'2026-07-19'+'.jsonl'; a.click();
-  toast('Saved nearmiss_'+'2026-07-19'+'.jsonl — or use 📋 Copy to paste it to your assistant');}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nearmiss_'+'2026-07-21'+'.jsonl'; a.click();
+  toast('Saved nearmiss_'+'2026-07-21'+'.jsonl — or use 📋 Copy to paste it to your assistant');}
 function copyOut(){
   const t = MODE==='nearmiss' ? nearLines() : lines();
   if(!t){toast(MODE==='nearmiss'?'Judge at least one paper first':'Rate at least one paper first'); return;}
@@ -1060,8 +1080,8 @@ function lines(){const ts=new Date().toISOString();
     .map(p=>JSON.stringify({id:p.id,doi:p.doi,title:p.title,venue:p.venue,date:p.date,
     llm_score:p.score,tier:p.tier,interest:R[p.id].interest,match:R[p.id].match,note:(R[p.id].note||''),ts:ts})).join('\n');}
 function dl(){const blob=new Blob([lines()+'\n'],{type:'application/x-ndjson'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ratings_'+'2026-07-19'+'.jsonl'; a.click();
-  toast('Saved ratings_'+'2026-07-19'+'.jsonl — drop it in state/ and run apply_ratings.py');}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ratings_'+'2026-07-21'+'.jsonl'; a.click();
+  toast('Saved ratings_'+'2026-07-21'+'.jsonl — drop it in state/ and run apply_ratings.py');}
 function dedup(a){return Array.from(new Set(a));}
 function toggleSave(el){const i=+el.dataset.i, id=PAPERS[i].id;
   if(SAVED.has(id)) SAVED.delete(id); else SAVED.add(id);
@@ -1078,18 +1098,18 @@ function dlBib(){const items=PAPERS.filter(p=>SAVED.has(p.id));
   if(!items.length){toast('Star a paper (☆) to add it to the reading queue first'); return;}
   const bib=items.map(bibtex).join('\n\n');
   const blob=new Blob([bib+'\n'],{type:'application/x-bibtex'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='reading_queue_'+'2026-07-19'+'.bib'; a.click();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='reading_queue_'+'2026-07-21'+'.bib'; a.click();
   toast('Saved '+items.length+' entr'+(items.length>1?'ies':'y')+' — append to reading_queue.bib (apply_queue.py)');}
 function dlTaste(){
   if(nTaste()===0){toast('No taste edits yet — toggle a rule, add a keyword, or pin a note first'); return;}
-  const P={_kind:'taste-patch', ts:new Date().toISOString(), date:'2026-07-19',
+  const P={_kind:'taste-patch', ts:new Date().toISOString(), date:'2026-07-21',
     negatives:{add:PATCH.negatives.add, disable:dedup(PATCH.negatives.disable), enable:dedup(PATCH.negatives.enable)},
     profile:{pinned_notes:PATCH.profile.pinned_notes, themes:PATCH.profile.themes},
     pool:{enable:dedup(PATCH.pool.enable), disable:dedup(PATCH.pool.disable), add_keywords:dedup(PATCH.pool.add_keywords)},
     bank:{remove:dedup(PATCH.bank.remove), add:PATCH.bank.add}};
   const blob=new Blob([JSON.stringify(P,null,1)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='taste-patch_'+'2026-07-19'+'.json'; a.click();
-  toast('Saved taste-patch_'+'2026-07-19'+'.json — run: python3 src/apply_taste_patch.py <file>');}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='taste-patch_'+'2026-07-21'+'.json'; a.click();
+  toast('Saved taste-patch_'+'2026-07-21'+'.json — run: python3 src/apply_taste_patch.py <file>');}
 // ---------- submit (explicit — nothing uploads until you click) + local-draft paint ----------
 function stamp(){return new Date().toISOString().replace(/[-:T]/g,'').slice(0,15);}
 function tcountShow(){const e=document.getElementById('tcount'); if(e) e.textContent=nTaste()+' taste edits';}
@@ -1117,6 +1137,7 @@ function paintRestored(){        // reflect a restored draft in the freshly-buil
         const grp=document.querySelector('.pips[data-i="'+i+'"][data-d="'+dim+'"]');
         if(grp)[...grp.children].forEach(b=>{const bv=+b.dataset.v; b.classList.toggle('fill',bv<=r[dim]); b.setAttribute('aria-checked',bv===r[dim]?'true':'false');});
       });
+      const _sb=document.querySelector('.segbar[data-i="'+i+'"]'); if(_sb){ const _cur=(r.interest===r.match)?r.interest:0; _sb.querySelectorAll('.sv').forEach(b=>{const on=(+b.dataset.v===_cur); b.classList.toggle('on',on); b.setAttribute('aria-checked',on?'true':'false');}); }
     } else if(r.verdict){
       document.querySelectorAll('.vbtn[data-i="'+i+'"]').forEach(b=>b.classList.toggle('on', b.dataset.v===r.verdict));
     }
@@ -1211,6 +1232,7 @@ function buildViewbar(){
     '<button class="vb-tog" id="vbTog" onclick="toggleViewbar()" title="collapse / expand the toolbar" aria-label="collapse toolbar">▾</button>'+
     '<div class="vb-in">'+
     '<span class="vlbl">show</span><div class="seg" id="segFilter"><button data-v="all" class="on">All</button><button data-v="unrated">Unrated</button><button data-v="rated">Rated</button></div>'+
+    '<span class="vb-ctrl" data-vk="when"><span class="vlbl">when</span><div class="seg" id="segDate"><button data-v="all" class="on">All</button><button data-v="today">Today</button><button data-v="7d">7d</button><button data-v="30d">30d</button></div></span>'+
     '<span class="vb-ctrl" data-vk="group"><span class="vlbl">group</span><div class="seg" id="segGroup"><button data-v="tier" class="on">Tier</button><button data-v="topic">Topic</button><button data-v="date">Date</button></div></span>'+
     '<span class="vb-ctrl" data-vk="sort"><span class="vlbl">sort</span><div class="seg" id="segSort"><button data-v="default" class="on">Default</button><button data-v="score">Score</button><button data-v="date">Date</button><button data-v="title">Title</button></div></span>'+
     '<span class="vb-ctrl" data-vk="density"><span class="vlbl">density</span><div class="seg" id="segDens"><button data-v="comfy" class="'+(VIEW.density==='comfy'?'on':'')+'">Comfortable</button><button data-v="compact" class="'+(VIEW.density==='compact'?'on':'')+'">Compact</button></div></span>'+
@@ -1227,11 +1249,12 @@ function buildViewbar(){
   wireSeg('segGroup',v=>{VIEW.group=v; VIEW.page=0; layout();});
   wireSeg('segSort',v=>{ if(VIEW.sort===v && v!=='default') VIEW.sortDir=(VIEW.sortDir==='desc'?'asc':'desc'); else VIEW.sort=v; VIEW.page=0; updateSortLabels(); layout(); });
   wireSeg('segDens',v=>{VIEW.density=v; applyDensity(v);});
-  ['segFilter','segGroup','segSort','segDens'].forEach(id=>{const s=document.getElementById(id); if(!s)return;   // #1 sliding indicator
+  wireSeg('segDate',v=>{VIEW.datef=v; VIEW.page=0; layout();});
+  ['segFilter','segGroup','segSort','segDens','segDate'].forEach(id=>{const s=document.getElementById(id); if(!s)return;   // #1 sliding indicator
     const ind=document.createElement('span'); ind.className='ind'; s.insertBefore(ind, s.firstChild);});
   updateSortLabels();
-  requestAnimationFrame(()=>['segFilter','segGroup','segSort','segDens'].forEach(id=>positionInd(document.getElementById(id))));
-  window.addEventListener('resize',()=>['segFilter','segGroup','segSort','segDens'].forEach(id=>positionInd(document.getElementById(id))));
+  requestAnimationFrame(()=>['segFilter','segGroup','segSort','segDens','segDate'].forEach(id=>positionInd(document.getElementById(id))));
+  window.addEventListener('resize',()=>['segFilter','segGroup','segSort','segDens','segDate'].forEach(id=>positionInd(document.getElementById(id))));
   // collapsible toolbar (option E): manual chevron + auto-collapse on scroll-down; 📌 pins it open
   if(localStorage.getItem('dp_vb_pin')==='1') vbEl.classList.add('pinned');
   _vbLastY=window.scrollY||window.pageYOffset||0;
@@ -1241,7 +1264,7 @@ function buildViewbar(){
 let VB_MODE=localStorage.getItem('dp_vb_mode')||'directional';
 function vbCollapse(on){ if(vbEl.classList.contains('collapsed')===on) return;
   vbEl.classList.toggle('collapsed', on);
-  if(!on) requestAnimationFrame(()=>['segFilter','segGroup','segSort','segDens'].forEach(id=>positionInd(document.getElementById(id)))); }
+  if(!on) requestAnimationFrame(()=>['segFilter','segGroup','segSort','segDens','segDate'].forEach(id=>positionInd(document.getElementById(id)))); }
   // NO debounce: overflow-anchor:none (on html/body) stops the browser re-scrolling when the bar collapses, so there's no phantom scroll to fight — a debounce here would only EAT the user's real up-scrolls (the "roll up won't show the bar" bug)
 function toggleViewbar(){ vbCollapse(!vbEl.classList.contains('collapsed')); }
 function setVbMode(m){ VB_MODE=m; try{localStorage.setItem('dp_vb_mode',m);}catch(e){} _vbLastY=window.scrollY||window.pageYOffset||0; }
@@ -1287,6 +1310,12 @@ function layout(){
   let vis=CARDS.filter(o=>{
     if(VIEW.filter==='unrated' && isRated(o.p)) return false;
     if(VIEW.filter==='rated' && !isRated(o.p)) return false;
+    if(VIEW.datef && VIEW.datef!=='all'){ const _d=o.p.date;
+      if(!_d) return false;
+      const _ag=Math.round((Date.parse(_refDate)-Date.parse(_d))/86400000);
+      if(VIEW.datef==='today' && _ag>0) return false;
+      if(VIEW.datef==='7d' && _ag>7) return false;
+      if(VIEW.datef==='30d' && _ag>30) return false; }
     if(VIEW.kw){ const hay=('|'+(o.el.dataset.kws||'')+'|').toLowerCase(); if(hay.indexOf('|'+VIEW.kw.toLowerCase()+'|')<0) return false; }
     if(VIEW.search){ const p=o.p, hay=((p.title||'')+' '+(p.venue||'')+' '+(p.abstract||p.why||'')).toLowerCase();
       if(VIEW.search.split(/\s+/).filter(Boolean).some(tk=>hay.indexOf(tk)<0)) return false; }   // header search bar: every token must appear in title/journal/abstract
@@ -1556,6 +1585,7 @@ function sparkSVG(vals){ const w=90,h=30,max=Math.max.apply(null,vals)||1,n=vals
 // sync a list card's pips/verdict/rated from R (deck + restore)
 function syncCard(o){ if(!o)return; const i=o.i, r=R[o.p.id], card=document.getElementById('c'+i); if(!card)return;
   if(!o.p.nm){ ['interest','match'].forEach(dim=>{ const grp=card.querySelector('.pips[data-d="'+dim+'"]'); if(grp)[...grp.children].forEach(b=>{const bv=+b.dataset.v; b.classList.toggle('fill',bv<=r[dim]); b.setAttribute('aria-checked',bv===r[dim]?'true':'false');}); }); }
+  if(!o.p.nm){ const _sb=card.querySelector('.segbar'); if(_sb){ const _cur=(r.interest===r.match)?r.interest:0; _sb.querySelectorAll('.sv').forEach(b=>{const on=(+b.dataset.v===_cur); b.classList.toggle('on',on); b.setAttribute('aria-checked',on?'true':'false');}); } }
   else if(r.verdict){ card.querySelectorAll('.vbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===r.verdict)); }
   const on=o.p.nm?(!!r.verdict||!!(r.note||'').trim()):(r.interest>1||r.match>1||!!(r.note||'').trim());
   card.classList.toggle('rated',on); }
@@ -1878,12 +1908,12 @@ function restoreSnap(s){ Object.keys(R).forEach(k=>delete R[k]); Object.assign(R
 </script><script>window.SUPA={url:'https://tdilpcylsnpdgyezzcok.supabase.co',key:'sb_publishable_cIeF_zQEYzOZDCAFOhmL1A_prgN4Uym'};</script>
 <style>
 /* shared (lab) mode — activated by html.shared; hides owner-only controls, adds pooled 3-way vote */
-html.shared .ratebar{display:none!important}
+html.shared .ratebar,html.shared .segbar:not(.lp-vote){display:none!important}
 html.shared #subbtn,html.shared .subring,html.shared .subring-more{display:none!important}
 html.shared .set-tab[data-t="account"],html.shared .set-tab[data-t="taste"],html.shared .set-tab[data-t="exp"],
 html.shared .set-pane[data-p="account"],html.shared .set-pane[data-p="taste"],html.shared .set-pane[data-p="exp"]{display:none!important}
 html.shared .lp-vote{margin:11px 0 4px}
-html.shared .lp-vote .dv .n{font-family:var(--mono);opacity:.72;font-weight:700;margin-left:6px}
+html.shared .lp-vote .sv .n{font-family:var(--mono);opacity:.72;font-weight:700;margin-left:6px}
 html.shared .lp-detrow{margin:1px 0 2px}
 html.shared .lp-dtog{font-family:var(--mono);font-size:12px;background:none;border:none;color:var(--brand);cursor:pointer;padding:2px 0}
 html.shared .lp-detail{display:none;margin:4px 0 2px;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
@@ -1920,9 +1950,9 @@ html.shared .lp-detail .nt{margin:3px 0 5px 3px;padding-left:9px;border-left:2px
     CARDS.forEach(function(o){
       var card=o.el, id=o.p.id;
       if(card.querySelector(".lp-vote")) return;
-      var row=document.createElement("div"); row.className="deck-vote lp-vote";
+      var row=document.createElement("div"); row.className="segbar lp-vote";
       VMAP.forEach(function(m){
-        var b=document.createElement("button"); b.className="dv "+m[1]; b.dataset.v=m[0];
+        var b=document.createElement("button"); b.className="sv "+m[1]; b.dataset.v=m[0];
         b.innerHTML=m[2]+' <span class="n">0</span>';
         b.onclick=function(){ vote(card,id,m[0]); };
         row.appendChild(b);
@@ -1932,7 +1962,7 @@ html.shared .lp-detail .nt{margin:3px 0 5px 3px;padding-left:9px;border-left:2px
       var det=document.createElement("div"); det.className="lp-detail";
       tog.onclick=function(){ det.classList.toggle("open"); };
       dr.appendChild(tog); dr.appendChild(det);
-      var anchor=card.querySelector(".flabel")||card.querySelector(".ratebar");
+      var anchor=card.querySelector(".flabel")||card.querySelector(".segbar");
       if(anchor){ anchor.parentNode.insertBefore(row,anchor); anchor.parentNode.insertBefore(dr,anchor); }
       else { card.appendChild(row); card.appendChild(dr); }
     });
@@ -1941,7 +1971,7 @@ html.shared .lp-detail .nt{margin:3px 0 5px 3px;padding-left:9px;border-left:2px
     CARDS.forEach(function(o){
       var id=o.p.id, c=COUNTS[id]||{}, mine=MYVOTE[id], row=o.el.querySelector(".lp-vote");
       if(!row) return;
-      row.querySelectorAll(".dv").forEach(function(b){
+      row.querySelectorAll(".sv").forEach(function(b){
         var v=b.dataset.v, n=(v==="interested"?c.n_interested:v==="maybe"?c.n_maybe:c.n_not)||0;
         b.querySelector(".n").textContent=n; b.classList.toggle("on", mine===v);
       });
