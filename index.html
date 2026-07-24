@@ -753,7 +753,7 @@ function xadd(id,label,inner){ return `<div class="xadd" id="xadd-${id}"><button
 function renderTaste(){
   const d=document.createElement('details'); d.className='taste';
   const nKw=TASTE.bank.filter(g=>g.core).reduce((a,g)=>a+g.kws.length,0);
-  const rails=[['themes','Core themes',TASTE.themes.length],['neg','Negatives',TASTE.negatives.length],['bank','Keyword bank',nKw],['weights','Weights','frozen'],['notes','Notes','']];
+  const rails=[['themes','Core themes',TASTE.themes.length],['neg','Negatives',TASTE.negatives.length],['bank','Keyword bank',nKw],['weights','Weights','frozen'],['notes','Personal prompts','']];
   let h='<summary><span class="car">▸</span>🎛 Your taste — view &amp; tune '+
         '<span style="font-weight:500;opacity:.7;font-size:12px">(edits are append-safe; download the patch, then run apply_taste_patch.py)</span></summary>'+
         '<div class="tbody"><div class="taste-wrap"><div class="taste-rail" id="tasterail">'+
@@ -777,8 +777,8 @@ function renderTaste(){
   h+='<div class="taste-sec" data-ts="weights"><div class="sec">Learned weights <span class="sub">n='+(w.n_ratings||0)+' · FROZEN (not applied)</span></div>'+
      '<div class="note-frozen">Numeric multipliers are benched until a rating pass proves they beat the embedding — your real taste lives in the themes + negatives, not these numbers.</div><div class="wbars" id="weightbars"></div></div>';
   // pinned notes
-  h+='<div class="taste-sec" data-ts="notes"><div class="sec">Pin a note <span class="sub">(human-owned; kept separate from the auto LEARNED block)</span></div>'+
-     xadd('pin','＋ pin a note','<input type="text" id="pinp" placeholder="a durable note to the scorer, e.g. up-weight rare-variant burden methods"><button class="mini" onclick="addPin()">pin</button>')+
+  h+='<div class="taste-sec" data-ts="notes"><div class="sec">Personal prompts <span class="sub">(who you are + your recommendation rules - feed the scorer)</span></div>'+
+     xadd('pin','＋ add a personal prompt','<input type="text" id="pinp" placeholder="Who are you, and what rules? e.g. human genetics research, not non-human targets"><button class="mini" onclick="addPin()">add</button>')+
      '<div class="pending" id="pinadded"></div></div>';
   h+='</div></div></div>';
   d.innerHTML=h; d.open=true; (document.getElementById('set-tab-taste')||main).appendChild(d);
