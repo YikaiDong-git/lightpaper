@@ -1944,8 +1944,7 @@ html.shared #subbtn,html.shared .subring,html.shared .subring-more{display:none!
 html.shared .set-tab[data-t="account"],html.shared .set-tab[data-t="exp"],
 html.shared .set-pane[data-p="account"],html.shared .set-pane[data-p="exp"]{display:none!important}
 /* taste EXPOSED read-only for lab: show the pane, disable every edit affordance */
-html.shared .set-pane[data-p="taste"] button,html.shared .set-pane[data-p="taste"] input,html.shared .set-pane[data-p="taste"] textarea,html.shared .set-pane[data-p="taste"] [contenteditable]{pointer-events:none!important;opacity:.9}
-html.shared .set-pane[data-p="taste"]::before{content:"Read-only view \2014 the owner\2019s taste, shown so you can see why papers surface";display:block;font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:0 0 8px;padding:5px 8px;border:1px dashed var(--line);border-radius:7px}
+html.shared .set-pane[data-p="taste"]::before{content:"Your taste \2014 adjust it here; edits build a patch you download, then apply_taste_patch.py applies it";display:block;font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:0 0 8px;padding:5px 8px;border:1px dashed var(--line);border-radius:7px}
 html.shared .lp-vote{margin:11px 0 4px}
 html.shared .lp-vote .sv .n{font-family:var(--mono);opacity:.72;font-weight:700;margin-left:6px}
 html.shared .lp-detrow{margin:1px 0 2px}
@@ -1970,7 +1969,6 @@ html.shared .lp-detail .nt{margin:3px 0 5px 3px;padding-left:9px;border-left:2px
   if(!window.SUPA || typeof CARDS==='undefined' || typeof PAPERS==='undefined'){ return; }
   var U=SUPA.url, K=SUPA.key, H={apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json"};
   document.documentElement.classList.add("shared");
-    try{document.querySelectorAll('.set-pane[data-p="taste"] [contenteditable]').forEach(function(e){e.contentEditable="false";});document.querySelectorAll('.set-pane[data-p="taste"] button,.set-pane[data-p="taste"] input,.set-pane[data-p="taste"] textarea').forEach(function(e){e.disabled=true;e.readOnly=true;});}catch(_){}
   var PASS=localStorage.getItem("lp_pass")||"", ME=localStorage.getItem("lp_me")||"";
   var COUNTS={}, MYVOTE={}, DETAIL={};
   var VMAP=[["interested","y","★ Interested"],["maybe","m","◐ Maybe"],["not","n","✕ Not for me"]];
