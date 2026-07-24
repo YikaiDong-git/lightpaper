@@ -778,7 +778,7 @@ function renderTaste(){
      '<div class="note-frozen">Numeric multipliers are benched until a rating pass proves they beat the embedding — your real taste lives in the themes + negatives, not these numbers.</div><div class="wbars" id="weightbars"></div></div>';
   // pinned notes
   h+='<div class="taste-sec" data-ts="notes"><div class="sec">Personal prompts <span class="sub">(who you are + your recommendation rules - feed the scorer)</span></div>'+
-     xadd('pin','＋ add a personal prompt','<input type="text" id="pinp" placeholder="Who are you, and what rules? e.g. human genetics research, not non-human targets"><button class="mini" onclick="addPin()">add</button>')+
+     xadd('pin','＋ add a personal prompt','<textarea id="pinp" rows="5" style="width:100%;min-height:96px;resize:vertical;font:inherit;line-height:1.45;padding:8px" placeholder="Who are you, and what rules? e.g. human genetics research, not non-human targets. Write freely across multiple lines."></textarea><button class="mini" onclick="addPin()" style="margin-top:6px">add</button>')+
      '<div class="pending" id="pinadded"></div></div>';
   h+='</div></div></div>';
   d.innerHTML=h; d.open=true; (document.getElementById('set-tab-taste')||main).appendChild(d);
