@@ -2068,6 +2068,32 @@ html.shared .lp-detail .nt{margin:3px 0 5px 3px;padding-left:9px;border-left:2px
     pin.focus();
   }
 
+  // deck (swipe) mode: vote through Supabase in shared mode so deck<->standard stay in sync
+  var DVN={5:"interested",3:"maybe",2:"not"};
+  function lpDeckHi(){
+    if(typeof deckList==="undefined") return;
+    var o=deckList[deckIdx]; if(!o) return; var id=o.p.id;
+    var ctrl=document.getElementById("deckctrl"); if(!ctrl) return;
+    ctrl.querySelectorAll(".deck-vote .dv").forEach(function(b){ b.classList.toggle("on", MYVOTE[id]===DVN[+b.dataset.v]); });
+  }
+  if(typeof deckVote==="function"){
+    deckVote=function(v){                                   // reassign the global -> deck buttons AND keyboard route here
+      if(typeof deckList==="undefined") return;
+      var o=deckList[deckIdx]; if(!o||o.p.nm) return;
+      if(!PASS||!ME){ openGate(); return; }
+      var id=o.p.id, verdict=DVN[v]; if(!verdict) return;
+      var willAdvance=(MYVOTE[id]!==verdict);               // a new vote advances; clicking the active one undoes + stays
+      vote(o.el,id,verdict);                                 // shim vote(): submit, or clear if the same choice, then refresh standard
+      var ctrl=document.getElementById("deckctrl");          // optimistic highlight (refresh() then confirms + syncs the list)
+      if(ctrl) ctrl.querySelectorAll(".deck-vote .dv").forEach(function(b){ b.classList.toggle("on", DVN[+b.dataset.v]===(willAdvance?verdict:null)); });
+      if(willAdvance && typeof deckNext==="function") setTimeout(deckNext,260);
+    };
+  }
+  if(typeof renderDeck==="function"){
+    var _lpRD=renderDeck;
+    renderDeck=function(){ _lpRD.apply(this,arguments); lpDeckHi(); };   // highlight the deck card from MYVOTE on open/nav
+  }
+
   // boot
   injectVotes(); setWho();
   loadCounts().then(applyCounts);
