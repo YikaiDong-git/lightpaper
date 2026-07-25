@@ -278,6 +278,9 @@ details.taste[open]>summary .car{transform:rotate(90deg)}
 .xadd.open .xbtn{border-style:solid;background:var(--brand);color:var(--on-brand)}
 .xadd input[type=text]{flex:1;min-width:170px;font:12.5px var(--sans);color:inherit;background:var(--surface2);border:1px solid var(--line);border-radius:7px;padding:6px 9px}
 .xadd select{font:12.5px var(--sans);padding:6px;border-radius:6px;background:var(--surface2);color:inherit;border:1px solid var(--line)}
+.pinbox{display:block;width:100%;box-sizing:border-box;min-height:132px;resize:vertical;font:13px/1.5 var(--sans);color:inherit;background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px;margin:2px 0}
+.pinbox:focus{outline:2px solid var(--brand);outline-offset:0;border-color:transparent}
+.pinbox::placeholder{color:var(--faint,var(--dim))}
 /* account: passport + constellation (D1/D6) */
 .passport{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--brand) 11%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--brand) 26%,var(--line));border-radius:12px;padding:14px 16px;margin:6px 0 14px}
 .passport .pbig{font-family:var(--serif);font-size:32px;font-weight:600;color:var(--brand);line-height:1;flex:none}
@@ -778,7 +781,8 @@ function renderTaste(){
      '<div class="note-frozen">Numeric multipliers are benched until a rating pass proves they beat the embedding — your real taste lives in the themes + negatives, not these numbers.</div><div class="wbars" id="weightbars"></div></div>';
   // pinned notes
   h+='<div class="taste-sec" data-ts="notes"><div class="sec">Personal prompts <span class="sub">(who you are + your recommendation rules - feed the scorer)</span></div>'+
-     xadd('pin','＋ add a personal prompt','<textarea id="pinp" rows="5" style="width:100%;min-height:96px;resize:vertical;font:inherit;line-height:1.45;padding:8px" placeholder="Who are you, and what rules? e.g. human genetics research, not non-human targets. Write freely across multiple lines."></textarea><button class="mini" onclick="addPin()" style="margin-top:6px">add</button>')+
+     '<textarea id="pinp" class="pinbox" rows="6" placeholder="Who are you, and what rules? e.g. I study human / statistical genetics; down-weight non-human-only targets. Write freely across several lines."></textarea>'+
+     '<div style="margin-top:8px"><button class="mini" onclick="addPin()">add prompt</button></div>'+
      '<div class="pending" id="pinadded"></div></div>';
   h+='</div></div></div>';
   d.innerHTML=h; d.open=true; (document.getElementById('set-tab-taste')||main).appendChild(d);
