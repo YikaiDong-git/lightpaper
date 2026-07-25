@@ -1,4 +1,5 @@
 <title>light·Paper — models vs your scores (why)</title>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root{--bg:#f6f7f9;--panel:#fff;--ink:#1a1c20;--muted:#6a7078;--line:#e4e7ec;--accent:#2563a8;--warn:#c2410c;
@@ -22,7 +23,7 @@ button.primary{background:var(--accent);color:#fff;border-color:transparent}
 .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
 table.grid{border-collapse:collapse;width:100%;min-width:900px}
 .grid th,.grid td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-.grid th{position:sticky;top:52px;background:var(--panel);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);z-index:2}
+.grid th{position:sticky;top:var(--hoff,52px);background:var(--panel);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);z-index:2}
 td.sc,th.sc{text-align:center;width:118px;font-variant-numeric:tabular-nums}
 .pill{display:inline-block;min-width:24px;padding:2px 7px;border-radius:6px;font-weight:600;font-size:13px}
 .p5{background:var(--s5)}.p6{background:var(--s6)}.p7{background:var(--s7)}.p8{background:var(--s8);color:#fff}.p9{background:var(--s9);color:#fff}.p10{background:var(--s10);color:#fff}.drop{color:var(--muted)}
@@ -97,6 +98,8 @@ document.getElementById('export').addEventListener('click',()=>{
  const txt=JSON.stringify(out,null,1);navigator.clipboard&&navigator.clipboard.writeText(txt);
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download='my_reasons.json';a.click();
  alert('Exported '+Object.keys(out).length+' reasons (also copied to clipboard).');});
+function syncStick(){var c=document.querySelector('.controls');if(c)document.documentElement.style.setProperty('--hoff',Math.round(c.getBoundingClientRect().height)+'px');}
+syncStick();window.addEventListener('resize',syncStick);
 render();
 </script>
 
