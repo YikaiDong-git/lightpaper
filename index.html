@@ -1031,7 +1031,7 @@ main.appendChild(chEl); main.appendChild(wmEl); main.appendChild(vbEl); main.app
 zone.addEventListener('mousemove',e=>{const c=e.target.closest('.card'); if(!c)return; const r=c.getBoundingClientRect(); c.style.setProperty('--mx',(e.clientX-r.left)+'px'); c.style.setProperty('--my',(e.clientY-r.top)+'px');});   // #15 spotlight
 zone.addEventListener('click',e=>{const chip=e.target.closest('.chip'); if(!chip)return; const r=chip.getBoundingClientRect(); const s=document.createElement('span'); s.className='ripple'; s.style.left=(e.clientX-r.left)+'px'; s.style.top=(e.clientY-r.top)+'px'; chip.appendChild(s); setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s);},520);});   // #17 ripple
 const VIEW={filter:'all', group:'tier', sort:'score', sortDir:'desc', page:0,
-            density:(localStorage.getItem('dp_dense')==='1'?'compact':'comfy'), kw:null, search:'', datef:'30d', monStart:null, monEnd:null, minScore:8};
+            density:(localStorage.getItem('dp_dense')==='1'?'compact':'comfy'), kw:null, search:'', datef:'30d', monStart:null, monEnd:null, minScore:8, maxScore:null};
 const _refDate=PAPERS.reduce((m,p)=>(p.date&&p.date>m)?p.date:m,'');
 // --- search-time by-month range picker (VIEW.datef==='mon' with VIEW.monStart/monEnd = 'YYYY-MM') ---
 const _MONNAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1278,7 +1278,7 @@ function buildViewbar(){
     '<button class="vb-tog" id="vbTog" onclick="toggleViewbar()" title="collapse / expand the toolbar" aria-label="collapse toolbar">▾</button>'+
     '<div class="vb-in">'+
     '<span class="vlbl">show</span><div class="seg" id="segFilter"><button data-v="all" class="on">All</button><button data-v="unrated">Unvoted</button><button data-v="rated">Voted</button></div>'+
-    '<span class="vb-ctrl" data-vk="score"><span class="vlbl">score ≥</span><input id="minScore" type="number" min="0" max="10" step="1" inputmode="numeric" placeholder="—" value="'+(VIEW.minScore!=null?VIEW.minScore:'')+'" oninput="setMinScore(this.value)" title="show only papers scoring ≥ this" style="width:46px;font-family:var(--mono);font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)"></span>'+
+    '<span class="vb-ctrl" data-vk="score"><span class="vlbl">score</span><input id="minScore" type="number" min="0" max="10" step="1" inputmode="numeric" placeholder="min" value="'+(VIEW.minScore!=null?VIEW.minScore:'')+'" oninput="setMinScore(this.value)" title="lowest score to show (blank = no lower bound)" style="width:44px;font-family:var(--mono);font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)"><span style="opacity:.55;padding:0 3px">–</span><input id="maxScore" type="number" min="0" max="10" step="1" inputmode="numeric" placeholder="max" value="'+(VIEW.maxScore!=null?VIEW.maxScore:'')+'" oninput="setMaxScore(this.value)" title="highest score to show (blank = no upper bound)" style="width:44px;font-family:var(--mono);font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)"></span>'+
     '<span class="vb-ctrl" data-vk="when"><span class="vlbl">when</span><div class="seg" id="segDate"><button data-v="1d">1 day</button><button data-v="7d">7 days</button><button data-v="30d" class="on">a month</button><button data-v="all">All</button></div><div class="monthpick" id="monthPick"><button class="mbtn" id="monthBtn" onclick="toggleMonth(event)" title="pick a month range">📅 <span id="monthLbl">month</span> ▾</button><div class="monthpop" id="monthPop"></div></div></span>'+
     '<span class="vb-ctrl" data-vk="group"><span class="vlbl">group</span><div class="seg" id="segGroup"><button data-v="tier" class="on">Tier</button><button data-v="topic">Topic</button><button data-v="date">Date</button></div></span>'+
     '<span class="vb-ctrl" data-vk="sort"><span class="vlbl">sort</span><div class="seg" id="segSort"><button data-v="default">Default</button><button data-v="score" class="on">Score</button><button data-v="interest">Interested</button><button data-v="date">Date</button><button data-v="title">Title</button></div></span>'+
@@ -1331,8 +1331,9 @@ function wireSeg(id,cb){const s=document.getElementById(id); if(!s)return;
   s.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return;
     [...s.querySelectorAll('button')].forEach(x=>x.classList.remove('on')); b.classList.add('on'); positionInd(s); cb(b.dataset.v);});}
 function syncSeg(id,v){const s=document.getElementById(id); if(!s)return; [...s.querySelectorAll('button')].forEach(b=>b.classList.toggle('on', b.dataset.v===v)); positionInd(s);}
-function resetView(){ VIEW.filter='all'; VIEW.kw=null; VIEW.minScore=null; VIEW.page=0; syncSeg('segFilter','all'); const ms=document.getElementById('minScore'); if(ms)ms.value=''; const p=document.getElementById('kwpill'); if(p)p.classList.remove('on'); layout(); }
+function resetView(){ VIEW.filter='all'; VIEW.kw=null; VIEW.minScore=null; VIEW.maxScore=null; VIEW.page=0; syncSeg('segFilter','all'); const ms=document.getElementById('minScore'); if(ms)ms.value=''; const mx=document.getElementById('maxScore'); if(mx)mx.value=''; const p=document.getElementById('kwpill'); if(p)p.classList.remove('on'); layout(); }
 function setMinScore(v){ v=(v==null?'':String(v).trim()); const n=+v; VIEW.minScore=(v===''||isNaN(n))?null:Math.max(0,Math.min(10,n)); VIEW.page=0; layout(); }
+function setMaxScore(v){ v=(v==null?'':String(v).trim()); const n=+v; VIEW.maxScore=(v===''||isNaN(n))?null:Math.max(0,Math.min(10,n)); VIEW.page=0; layout(); }
 function toggleFocusMode(){ const z=document.getElementById('cardzone'); if(!z)return; const on=z.classList.toggle('focusmode');
   if(on){ if(!z.querySelector('.card.kbfocus')){ const first=z.querySelector('.card'); if(first)focusCardEl(first); } toast('Focus mode on — j/k to move · f to exit'); }
   else toast('Focus mode off'); }
@@ -1360,7 +1361,10 @@ function hideSubMenu(){ const m=document.getElementById('submenu'); if(m)m.class
 function passFilter(o){
   if(VIEW.filter==='unrated' && isRated(o.p)) return false;
   if(VIEW.filter==='rated' && !isRated(o.p)) return false;
-  if(VIEW.minScore!=null){ if(o.p.score==null || o.p.score<VIEW.minScore) return false; }   // score >= N
+  if(VIEW.minScore!=null || VIEW.maxScore!=null){   // score range; either bound may be blank
+    var _sc=o.p.score; if(_sc==null||_sc==='') return false; _sc=+_sc; if(isNaN(_sc)) return false;
+    if(VIEW.minScore!=null && _sc<VIEW.minScore) return false;
+    if(VIEW.maxScore!=null && _sc>VIEW.maxScore) return false; }
   if(VIEW.datef && VIEW.datef!=='all'){ const _d=o.p.date;
     if(VIEW.datef==='mon'){ const _ym=(_d||'').slice(0,7); if(!_ym||_ym<VIEW.monStart||_ym>VIEW.monEnd) return false; }
     else { if(!_d) return false;
@@ -1373,11 +1377,11 @@ function passFilter(o){
     if(VIEW.search.split(/\s+/).filter(Boolean).some(tk=>hay.indexOf(tk)<0)) return false; }
   return true;
 }
-function filterActive(){ return VIEW.filter!=='all' || VIEW.minScore!=null || (VIEW.datef&&VIEW.datef!=='all') || !!VIEW.kw || !!VIEW.search; }
+function filterActive(){ return VIEW.filter!=='all' || VIEW.minScore!=null || VIEW.maxScore!=null || (VIEW.datef&&VIEW.datef!=='all') || !!VIEW.kw || !!VIEW.search; }
 function layout(){
   zone.innerHTML=''; nav.innerHTML=''; zone.classList.toggle('timeline', VIEW.group==='date');
   let vis=CARDS.filter(passFilter);
-  const _sig=VIEW.filter+'|'+VIEW.minScore+'|'+VIEW.datef+'|'+VIEW.monStart+'|'+VIEW.monEnd+'|'+VIEW.kw+'|'+VIEW.search;
+  const _sig=VIEW.filter+'|'+VIEW.minScore+'|'+VIEW.maxScore+'|'+VIEW.datef+'|'+VIEW.monStart+'|'+VIEW.monEnd+'|'+VIEW.kw+'|'+VIEW.search;
   if(_sig!==_wmSig){ buildWeekmast(vis); _wmSig=_sig; }   // dashboard aggregates change only with the FILTER, not page/sort/group/density
   const groups=new Map();
   vis.forEach(o=>{ const k=groupKey(o); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(o); });
@@ -2391,7 +2395,7 @@ html.shared .kwpop .kwfoot button:hover{color:var(--brand)}
 (function(){
   var BIG=1000, OKSIG=null, orig=window.layout;
   if(typeof orig!=='function') return;
-  function sig(){ return [VIEW.filter,VIEW.minScore,VIEW.datef,VIEW.monStart,VIEW.monEnd,VIEW.kw,VIEW.search].join('|'); }
+  function sig(){ return [VIEW.filter,VIEW.minScore,VIEW.maxScore,VIEW.datef,VIEW.monStart,VIEW.monEnd,VIEW.kw,VIEW.search].join('|'); }
   window.__bigProceed=function(){ OKSIG=sig(); layout(); };
   window.__bigReset=function(){                       /* back to the lab default view, not a blank one */
     OKSIG=null; VIEW.filter='all'; VIEW.kw=null; VIEW.search=''; VIEW.page=0;
