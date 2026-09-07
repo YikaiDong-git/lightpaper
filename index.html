@@ -661,6 +661,25 @@ mark{background:color-mix(in srgb,var(--worth) 30%,transparent);color:inherit;bo
 .monthgrid .mo.end{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
 .monthpop .mclear{margin-top:9px;width:100%;border:0;background:none;color:var(--faint);font-family:var(--mono);font-size:10.5px;cursor:pointer}
 .monthpop .mclear:hover{color:var(--brand)}
+
+/* ---- version fold ---- */
+.vfb{background:var(--chip,#243447);color:var(--accent,#7aa2f7);border-radius:4px;padding:1px 6px;
+     font-size:11px;font-weight:600;letter-spacing:.02em}
+.depb{background:#3a3524;color:#e0af68;border-radius:4px;padding:1px 6px;font-size:11px}
+.dmatch{color:var(--faint,#8a93a5);font-size:11.5px}
+details.vfold{margin:6px 0 2px;border-left:2px solid var(--line,#2a2f3a);padding-left:10px}
+details.vfold summary{cursor:pointer;font-size:12px;color:var(--faint,#8a93a5);list-style:none;
+     display:flex;gap:7px;align-items:center;padding:2px 0}
+details.vfold summary::-webkit-details-marker{display:none}
+details.vfold summary::before{content:'b8';display:inline-block;transition:transform .12s;font-size:10px}
+details.vfold[open] summary::before{transform:rotate(90deg)}
+details.vfold .vfn{font-weight:700;color:var(--accent,#7aa2f7)}
+details.vfold .vfr{opacity:.65;font-size:11px}
+details.vfold ul{margin:4px 0 6px;padding:0 0 0 14px;list-style:none}
+details.vfold li{margin:5px 0;font-size:12.5px;line-height:1.45}
+details.vfold li a{color:var(--ink,#e6e9ef);text-decoration:none;border-bottom:1px solid transparent}
+details.vfold li a:hover{border-bottom-color:var(--accent,#7aa2f7)}
+details.vfold .vmeta{display:block;color:var(--faint,#8a93a5);font-size:11.5px;margin-top:1px}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.2l2.6 5.7 6.2.7-4.6 4.2 1.2 6.1L12 16.9 6.4 19.9l1.2-6.1L3 9.6l6.2-.7z"/></symbol>
@@ -710,6 +729,12 @@ const TASTE = {"themes": [], "negatives": [{"id": "nonhuman-organism", "pattern"
 const MODE = "rate";            // 'rate' (Interest/Match) or 'nearmiss' (did the cutoff wrongly hide this?)
 const CHANGED = {"applied_at": "2026-07-18T15:08:48.892Z", "added_keywords": ["clonal hematopoiesis", "clonal haematopoiesis", "gene perturbation", "perturb-seq"], "capped": ["method/finding demonstrated or validated ONLY in a non-", "pure clinical case report, trial protocol, or epidemiol", "wet-lab-only study with no computational, statistical, "], "themes": [], "n_ratings": 25};        // #21 — what the last apply changed (or null)
 const R = {};
+// Folding removes ~700 member ids from PAPERS. Notes and saves are keyed by paper id and the
+// restore path drops anything not in R, so without this map every note/save on a folded-away
+// version is silently destroyed on first load after the fold ships.
+const ID2HEAD = {};
+PAPERS.forEach(p => (p.vids||[]).forEach(v => { if(v && v!==p.id) ID2HEAD[v]=p.id; }));
+function canonId(id){ return (R[id]!==undefined) ? id : (ID2HEAD[id] || id); }
 PAPERS.forEach(p => R[p.id] = (MODE==='nearmiss'||p.nm) ? {verdict:null, note:''} : {interest:1, match:1, note:''});
 // taste patch accumulator (append-safe & fully reversible). One-click +suggest chips go to the EXPLORE
 // pool (bank.? no); a DELIBERATELY TYPED keyword in the bank section goes to CORE (bank.add).
@@ -734,8 +759,8 @@ function saveDraft(){
 function restoreDraft(){
   let d; try{ d = JSON.parse(localStorage.getItem(LSKEY) || 'null'); }catch(e){ d = null; }
   if(!d) return;
-  if(d.R) for(const id in d.R){ if(R[id]) Object.assign(R[id], d.R[id]); }        // only ids present in THIS digest
-  if(Array.isArray(d.saved)) d.saved.forEach(id=>{ if(R[id]!==undefined) SAVED.add(id); });
+  if(d.R) for(const id in d.R){ const _c=canonId(id); if(R[_c]) Object.assign(R[_c], d.R[id]); }   // via canonId: a rating made on a version that has since been folded away lands on its head
+  if(Array.isArray(d.saved)) d.saved.forEach(id=>{ const _c=canonId(id); if(R[_c]!==undefined) SAVED.add(_c); });
   const P = d.patch;
   if(P){
     if(P.negatives){PATCH.negatives.add=P.negatives.add||[];PATCH.negatives.disable=P.negatives.disable||[];PATCH.negatives.enable=P.negatives.enable||[];}
@@ -992,13 +1017,19 @@ function cardHTML(i,p){
   const meter=(p.score==null)
     ? `<div class="meter" aria-label="wildcard — no score"><span class="expl">${ico('i-spark')}</span><small>explore</small></div>`
     : `<div class="meter g" data-score="${p.score}" style="--v:${p.score}"><b>${p.score}</b></div>`;
+  // <details> rather than a custom toggle: native keyboard and screen-reader behaviour, and it
+  // survives buildEl()'s memoisation of o.el because open/closed state lives in the DOM node.
+  const vf=(p.nfold>1)?`<details class="vfold"><summary><span class="vfn">${p.nfold}</span> versions<span class="vfr">${p.fold_rule==='pubdoi'?'linked by the preprint server':(p.fold_rule==='component'?'components of this paper':'same work')}</span></summary>`+
+    `<ul>`+p.versions.map(v=>`<li><a href="${v.url||('https://doi.org/'+v.id)}" target="_blank" rel="noopener">${esc(v.title||v.id)}</a>`+
+      `<span class="vmeta">${esc(v.venue||v.cls)} · ${v.date||'—'}${v.score!=null&&v.score!==''?(' · score '+v.score):''}${v.voted?' · <b>you rated this</b>':''}</span></li>`).join('')+
+    `</ul></details>`:'';
   const ab=p.abstract
     ? `<div class="why" data-clamp="1"><span class="abx"><span class="lbl">Abstract</span> ${hlAbs(p.abstract,p.matched)}</span><button type="button" class="more" onclick="toggleMore(this)">show more</button></div>`
     : (p.why?`<div class="why"><span class="abx"><span class="lbl">Why</span> ${esc(p.why)}</span></div>`:'');
   return `<div class="ctop"><div class="chead"><h3>${t}</h3>`+
-      `<div class="meta">${ven} · ${p.date}${p.project?(' · <span class="proj">'+esc(p.project)+'</span>'):''}${rb}</div>`+
+      `<div class="meta">${ven} · ${p.date}${p.project?(' · <span class="proj">'+esc(p.project)+'</span>'):''}${rb}${p.nfold>1?(' · <span class="vfb">'+p.nfold+' versions</span>'):''}${p.deposit?' · <span class="depb">data/software</span>':''}<span class="dmatch"></span></div>`+
     `</div><div class="cright"><div class="cright-actions">${sv}<button class="cardmenu" onclick="cardMenu(this,${i})" title="more actions" aria-label="more actions">⋯</button></div>${meter}</div></div>`+
-    ab+ chipsHTML(i,p)+
+    ab+ vf+ chipsHTML(i,p)+
     ((MODE==='nearmiss'||p.nm) ? verdictRow(i) : segBar(i))+
     `<label class="flabel"><input class="note" data-i="${i}" oninput="setNote(this)" placeholder=" "><span class="fll">note — anything else the agent needs to know: paper, taste, confusion, topics, yourself, etc.</span><span class="ul"></span></label>`;
 }
@@ -1006,6 +1037,11 @@ function cardHTML(i,p){
 // LAZY: CARDS carries lightweight metadata (filter/sort/group run on this); the DOM element is
 // built on demand by buildEl() only for the current page's slice — was: eager-build ALL up front.
 const CARDS = PAPERS.map((p,i)=>({
+  // dts is a discrete date LIST, never a [min,max] span: versions at 2024-01 and 2024-12 must
+  // NOT match a 2024-06 window. Clusters are tiny, so the array is free.
+  dts:(p.versions ? Array.from(new Set(p.versions.map(v=>v.date).filter(Boolean))).sort()
+                  : (p.date ? [p.date] : [])),
+  nv:(p.nfold||1),
   el:null, i:i, p:p,
   slug:(TIER_SLUG[p.tier]||'fyi'),
   topic:topicOf(p),
@@ -1032,7 +1068,11 @@ zone.addEventListener('mousemove',e=>{const c=e.target.closest('.card'); if(!c)r
 zone.addEventListener('click',e=>{const chip=e.target.closest('.chip'); if(!chip)return; const r=chip.getBoundingClientRect(); const s=document.createElement('span'); s.className='ripple'; s.style.left=(e.clientX-r.left)+'px'; s.style.top=(e.clientY-r.top)+'px'; chip.appendChild(s); setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s);},520);});   // #17 ripple
 const VIEW={filter:'all', group:'tier', sort:'score', sortDir:'desc', page:0,
             density:(localStorage.getItem('dp_dense')==='1'?'compact':'comfy'), kw:null, search:'', datef:'30d', monStart:null, monEnd:null, minScore:8, maxScore:null};
-const _refDate=PAPERS.reduce((m,p)=>(p.date&&p.date>m)?p.date:m,'');
+// folding moves records off the top level, so reducing over head dates alone can only make
+// _refDate older -- which would silently widen every relative date filter.
+const _refDate=PAPERS.reduce((m,p)=>{ let x=(p.date&&p.date>m)?p.date:m;
+  if(p.versions) p.versions.forEach(v=>{ if(v.date&&v.date>x) x=v.date; });
+  return x; },'');
 // --- search-time by-month range picker (VIEW.datef==='mon' with VIEW.monStart/monEnd = 'YYYY-MM') ---
 const _MONNAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const _months=(function(){const ds=PAPERS.map(p=>(p.date||'').slice(0,7)).filter(Boolean).sort();if(!ds.length)return [];let a=ds[0].split('-');let y=+a[0],m=+a[1];const hi=ds[ds.length-1];const out=[];while(true){const ym=y+'-'+String(m).padStart(2,'0');out.push(ym);if(ym>=hi||out.length>=60)break;m++;if(m>12){m=1;y++;}}return out;})();
@@ -1343,7 +1383,28 @@ function clearKw(){ VIEW.kw=null; VIEW.page=0; const p=document.getElementById('
 
 // view engine — group/filter/sort; moving card nodes keeps rating state (#2/#8/#10/#14)
 function isRated(p){const r=R[p.id]; if(!r)return false; return p.nm?(!!r.verdict||!!(r.note||'').trim()):(r.interest>1||r.match>1||!!(r.note||'').trim());}
-function groupKey(o){ return VIEW.group==='topic'?o.topic : VIEW.group==='date'?(o.p.date||'—') : o.p.tier; }
+// Returns the single date this card is PLACED under for the active filter, or null if no
+// version matches. Each test is written as the EXACT NEGATION of the original predicate:
+// with monStart/monEnd undefined both comparisons coerce to false, so the original PASSED the
+// card; a rewritten `_ym>=a && _ym<=b` would REJECT every card and blank the page. Likewise
+// NaN>7 is false, so a malformed date still passes, exactly as before.
+function matchDate(o){
+  if(!VIEW.datef || VIEW.datef==='all') return o.p.date || null;
+  const ds=o.dts||[]; let best=null;
+  for(let k=0;k<ds.length;k++){
+    const _d=ds[k]; if(!_d) continue;
+    let ok;
+    if(VIEW.datef==='mon'){ const _ym=_d.slice(0,7);
+      ok = !(!_ym || _ym<VIEW.monStart || _ym>VIEW.monEnd); }
+    else { const _ag=Math.round((Date.parse(_refDate)-Date.parse(_d))/86400000);
+      ok = !(((VIEW.datef==='1d'||VIEW.datef==='today') && _ag>1)
+          || (VIEW.datef==='7d' && _ag>7)
+          || (VIEW.datef==='30d' && _ag>30)); }
+    if(ok && (best===null || _d>best)) best=_d;
+  }
+  return best;
+}
+function groupKey(o){ return VIEW.group==='topic'?o.topic : VIEW.group==='date'?(o._md||o.p.date||'—') : o.p.tier; }
 function slugify(s){return (String(s)).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'g';}
 // header search bar — filters the paper list live (title · journal · abstract)
 function doSearch(v){ const val=(v||'').trim().toLowerCase(); const x=document.getElementById('hsx'); if(x)x.style.display=val?'grid':'none'; clearTimeout(_searchT); _searchT=setTimeout(function(){ VIEW.search=val; VIEW.page=0; layout(); }, 180); }
@@ -1365,15 +1426,14 @@ function passFilter(o){
     var _sc=o.p.score; if(_sc==null||_sc==='') return false; _sc=+_sc; if(isNaN(_sc)) return false;
     if(VIEW.minScore!=null && _sc<VIEW.minScore) return false;
     if(VIEW.maxScore!=null && _sc>VIEW.maxScore) return false; }
-  if(VIEW.datef && VIEW.datef!=='all'){ const _d=o.p.date;
-    if(VIEW.datef==='mon'){ const _ym=(_d||'').slice(0,7); if(!_ym||_ym<VIEW.monStart||_ym>VIEW.monEnd) return false; }
-    else { if(!_d) return false;
-      const _ag=Math.round((Date.parse(_refDate)-Date.parse(_d))/86400000);
-      if((VIEW.datef==='1d'||VIEW.datef==='today') && _ag>1) return false;   /* rolling 1-day lookback = 2 dated days (_ag 0 and 1). Paper dates lag indexing, so the old _ag>0 equality test was usually empty. 'today' aliased so a stale value still filters instead of silently showing everything. */
-      if(VIEW.datef==='7d' && _ag>7) return false;
-      if(VIEW.datef==='30d' && _ag>30) return false; } }
+  // UNION over versions; matchDate() is pure. layout() memoises the winner into o._md so the
+  // group header and the nav count agree with the date the card actually matched on.
+  if(VIEW.datef && VIEW.datef!=='all' && matchDate(o)===null) return false;
   if(VIEW.kw){ const hay=('|'+(o.kws||'')+'|').toLowerCase(); if(hay.indexOf('|'+VIEW.kw.toLowerCase()+'|')<0) return false; }
-  if(VIEW.search){ const p=o.p, hay=((p.title||'')+' '+(p.venue||'')+' '+(p.abstract||p.why||'')).toLowerCase();
+  // version titles/venues join the haystack: E4 merges titles that DIFFER and head=published
+  // takes the journal venue, so without this a search for the preprint's wording or for
+  // "bioRxiv" returns nothing for a work that is still on the page.
+  if(VIEW.search){ const p=o.p, hay=((p.title||'')+' '+(p.venue||'')+' '+(p.abstract||p.why||'')+' '+((p.vtitles||[]).join(' '))+' '+((p.vvenues||[]).join(' '))).toLowerCase();
     if(VIEW.search.split(/\s+/).filter(Boolean).some(tk=>hay.indexOf(tk)<0)) return false; }
   return true;
 }
@@ -1381,6 +1441,7 @@ function filterActive(){ return VIEW.filter!=='all' || VIEW.minScore!=null || VI
 function layout(){
   zone.innerHTML=''; nav.innerHTML=''; zone.classList.toggle('timeline', VIEW.group==='date');
   let vis=CARDS.filter(passFilter);
+  vis.forEach(o=>{ o._md = matchDate(o); });   // single-valued placement for group/sort/display
   const _sig=VIEW.filter+'|'+VIEW.minScore+'|'+VIEW.maxScore+'|'+VIEW.datef+'|'+VIEW.monStart+'|'+VIEW.monEnd+'|'+VIEW.kw+'|'+VIEW.search;
   if(_sig!==_wmSig){ buildWeekmast(vis); _wmSig=_sig; }   // dashboard aggregates change only with the FILTER, not page/sort/group/density
   const groups=new Map();
@@ -1391,7 +1452,8 @@ function layout(){
   else keys.sort((a,b)=> groups.get(b).length-groups.get(a).length);
   const _dir = VIEW.sortDir==='asc'?-1:1;
   function scmp(a,b){ if(VIEW.sort==='interest'){ var _C=window.LPCOUNTS||{}, _ia=(_C[a.p.id]&&_C[a.p.id].n_interested)||0, _ib=(_C[b.p.id]&&_C[b.p.id].n_interested)||0; if(_ia!==_ib) return _dir*(_ib-_ia); return (b.p.score==null?-1:b.p.score)-(a.p.score==null?-1:a.p.score); } if(VIEW.sort==='score') return _dir*((b.p.score==null?-1:b.p.score)-(a.p.score==null?-1:a.p.score));
-    if(VIEW.sort==='date'){ const c=(a.p.date||'')>(b.p.date||'')?-1:((a.p.date||'')<(b.p.date||'')?1:0); return c!==0?_dir*c:a.i-b.i; }
+    if(VIEW.sort==='date'){ const _a=a._md||a.p.date||'', _b=b._md||b.p.date||'';
+      const c=_a>_b?-1:(_a<_b?1:0); return c!==0?_dir*c:a.i-b.i; }
     if(VIEW.sort==='title') return _dir*(a.p.title||'').localeCompare(b.p.title||'');
     return a.i-b.i; }
   if(!keys.length){ zone.innerHTML='<div class="emptystate"><div class="es-ic">☕</div><div class="es-msg">'+(VIEW.kw?('nothing tagged “'+esc(VIEW.kw)+'”'):'nothing matches this filter')+'</div><button class="es-btn" onclick="resetView()">show all papers</button></div>'; wireScrollspy(); updProgress(vis); return; }
@@ -1409,7 +1471,12 @@ function layout(){
     const sec=document.createElement('section'); sec.id=secid; if(VIEW.group==='date') sec.className='tl-group';
     const tic = VIEW.group==='tier'?(TIER_ICON[k]||'i-archive'):(VIEW.group==='date'?'i-archive':'i-sliders');
     sec.innerHTML=`<div class="masthead" style="--c:var(--${slug})"><span class="glyph">${ico(tic)}</span><h2>${esc(k)}</h2><span class="mrule"></span></div>`;
-    arr.forEach(o=>sec.appendChild(buildEl(o)));
+    arr.forEach(o=>{ const _el=buildEl(o); sec.appendChild(_el);
+      // disclosure: when a fold matched on a version OTHER than the head, say so, or the card
+      // silently shows a date the reader did not filter for.
+      const _dm=_el.querySelector('.dmatch');
+      if(_dm) _dm.textContent=(o._md && o.p.date && o._md!==o.p.date)?(' · matched '+o._md):'';
+    });
     zone.appendChild(sec);
     const a=document.createElement('a'); a.href='#'+secid; a.className='navlink'; a.style.setProperty('--c','var(--'+slug+')'); a.dataset.g=k;
     a.innerHTML=`<span class="ndot"></span> ${esc(k)} <span class="nn">${groups.get(k).length}</span> <span class="prog"></span>`;
