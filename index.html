@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rate — light·Paper 2026-09-15</title>
+<title>Rate — light·Paper 2026-09-16</title>
 <style>
 :root{
   --paper:#E8E8E2;--surface:#F4F3ED;--surface2:#EEEDE6;--ink:#1B1E24;--dim:#5E635D;--faint:#6C6F66;
@@ -696,7 +696,7 @@ details.vfold .vmeta{display:block;color:var(--faint,#8a93a5);font-size:11.5px;m
  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6"/></symbol>
 </svg>
 <header><div class="head-in">
-  <div class="hd-brand"><span class="brand" onclick="location.reload()" title="refresh" role="button" tabindex="0" style="cursor:pointer"><em>light</em>·Paper</span><span class="sub">read less, know more &middot; 2026-09-15</span></div>
+  <div class="hd-brand"><span class="brand" onclick="location.reload()" title="refresh" role="button" tabindex="0" style="cursor:pointer"><em>light</em>·Paper</span><span class="sub">read less, know more &middot; 2026-09-16</span></div>
   <div class="hsearch-wrap"><label class="hsearch"><span class="mag">🔍</span><input id="hsearch" type="search" placeholder="search papers — title · journal · abstract" oninput="doSearch(this.value)" autocomplete="off" spellcheck="false"><button type="button" class="hsx" id="hsx" onclick="clearSearch()" aria-label="clear search" tabindex="-1">✕</button></label></div>
   <div class="tools">
     <div class="subring-wrap">
@@ -723,6 +723,7 @@ details.vfold .vmeta{display:block;color:var(--faint,#8a93a5);font-size:11.5px;m
 <script src="lab_papers_03.js"></script>
 <script src="lab_papers_04.js"></script>
 <script src="lab_papers_05.js"></script>
+<script src="lab_papers_06.js"></script>
 <script>
 const PAPERS = window.__PAPERS__;
 const TASTE = {"themes": [], "negatives": [{"id": "nonhuman-organism", "pattern": "non-human organism. NO clearly transferable method or reusable influential resource.", "enabled": true}, {"id": "clinical-no-genomics", "pattern": "pure clinical case report, trial protocol, or epidemiology with no statistical genetics content", "enabled": true}, {"id": "wetlab-no-compute", "pattern": "wet-lab-only study with few no computational, statistical scope.", "enabled": true}, {"id": "narrow-disease-or-subpopulation", "pattern": "main contribution is too narrowly a SINGLE non-focus disease OR a reference/panel/analysis for limited specific sub-population or cohort, with NO transferable method and NO reusable data resource.", "enabled": true}], "weights": {"updated": "2026-07-18T15:08:48.892Z", "n_ratings": 25, "topics": {"statistical genetics": 1.177, "structural variation": 1.155, "long-read/under-explored": 1.155, "centromere/T2T": 1.144, "single-cell/spatial": 1.008}, "venues": {"medRxiv": 1.221, "bioRxiv": 1.194, "Algorithms for Molecular Biology": 1.125, "Nature Human Behaviour": 1.125, "Neuroendocrinology": 1.067}}, "bank": [{"group": "centromere/T2T", "kws": ["centromere", "satellite DNA", "alpha satellite", "pericentromere", "higher-order repeat (HOR)", "kinetochore", "centrosome", "telomere-to-telomere", "t2t", "hprc", "pangenome", "complete genome"], "core": true}, {"group": "clonal hematopoiesis", "kws": ["clonal hematopoiesis"], "core": true}, {"group": "perturbation genomics", "kws": ["gene perturbation", "perturb-seq"], "core": true}, {"group": "centromere-indirect", "kws": ["centrosome", "kinetochore"], "core": true}, {"group": "statistical genetics", "kws": ["gwas", "heritability", "ldsc", "genetic correlation", "coloc", "mendelian randomization", "finemap", "polygenic", " prs ", "twas", "pwas", "exome"], "core": true}, {"group": "complex variation", "kws": ["structural variant", "structural variation", "copy number variant", "segmental duplication", "gene duplication", "telomere", "rare variant", "numt", "mitochondrial dna", "mtdna"], "core": true}, {"group": "long-read/under-explored", "kws": ["long-read", "long read", "nanopore", "pacbio", "microprotein", "smorf", "loeuf", "nucleosome", "methylation", "epigenom"], "core": true}, {"group": "single-cell/spatial", "kws": ["single-cell", "spatial transcriptomic", "cell-cell communication", "niche"], "core": true}, {"group": "aging/cell-death", "kws": ["senescence", "aging", "ferroptosis", "mitoxyperilysis", "cell death"], "core": true}, {"group": "disease genetics", "kws": ["autism", "breast cancer", "type 1 diabetes"], "core": true}, {"group": "Pangenome graph genotyping", "kws": ["pangenome graph", "minigraph-cactus", "vg Giraffe", "PGGB", "Pangenie", "Locityper", "graph-based SV genotyping", "personalized pangenome", "HPRC pangenome", "PacBio"], "core": false, "enabled": true, "bucket": "safe"}, {"group": "Long-read direct base-modification epigenetics", "kws": ["nanopore methylation calling", "direct 5mC detection", "6mA nanopore", "modkit", "Dorado modified basecalling", "Fiber-seq", "allele-specific methylation long-read", "R10.4 modified basecalling", "Pore-C chromatin"], "core": false, "enabled": true, "bucket": "safe"}, {"group": "3D genome / Hi-C / Pore-C", "kws": ["Hi-C", "Micro-C", "Pore-C", "single-cell Hi-C", "chromatin loop", "TAD boundary", "A/B compartment", "cohesin loop extrusion", "centromere chromatin architecture"], "core": false, "enabled": false, "bucket": "safe"}, {"group": "Causal inference & modern MR / fine-mapping", "kws": ["SuSiE-inf", "cross-ancestry fine-mapping", "functionally-informed fine-mapping", "pleiotropy-robust Mendelian randomization", "proximal causal inference", "invalid instruments MR", "cis-MR effector"], "core": false, "enabled": true, "bucket": "safe"}, {"group": "Genomic / DNA language & sequence foundation models", "kws": ["DNA language model", "genomic foundation model", "Nucleotide Transformer", "Enformer", "Borzoi", "HyenaDNA", "Caduceus", "Evo 2", "GENA-LM", "zero-shot variant effect prediction", "in silico mutagenesis"], "core": false, "enabled": false, "bucket": "gated"}, {"group": "Single-cell / multi-omics foundation models", "kws": ["single-cell foundation model", "scGPT", "Geneformer", "scFoundation", "Universal Cell Embedding", "UCE", "zero-shot cell annotation", "scaling laws single-cell"], "core": false, "enabled": false, "bucket": "gated"}, {"group": "Ancient / evolutionary & selection genomics", "kws": ["ancient DNA", "paleogenomics", "satellite DNA evolution", "centromere evolution", "selective sweep detection", "meiotic drive genome", "segmental duplication evolution", "ancient methylation"], "core": false, "enabled": true, "bucket": "speculative"}, {"group": "From digest (user-added)", "kws": ["autism spectrum disorder", "tandem repeats"], "core": false, "enabled": true, "bucket": "safe"}], "pool": [{"area": "Pangenome graph genotyping", "bucket": "safe", "enabled": true, "n": 10}, {"area": "Long-read direct base-modification epigenetics", "bucket": "safe", "enabled": true, "n": 9}, {"area": "3D genome / Hi-C / Pore-C", "bucket": "safe", "enabled": false, "n": 9}, {"area": "Causal inference & modern MR / fine-mapping", "bucket": "safe", "enabled": true, "n": 7}, {"area": "Genomic / DNA language & sequence foundation models", "bucket": "gated", "enabled": false, "n": 11}, {"area": "Single-cell / multi-omics foundation models", "bucket": "gated", "enabled": false, "n": 8}, {"area": "Ancient / evolutionary & selection genomics", "bucket": "speculative", "enabled": true, "n": 8}, {"area": "From digest (user-added)", "bucket": "safe", "enabled": true, "n": 2}]};
@@ -743,7 +744,7 @@ const PATCH = {negatives:{add:[],disable:[],enable:[]},
                pool:{enable:[],disable:[],add_keywords:[]}, bank:{remove:[],add:[]}};
 const SAVED = new Set();            // reading queue -> BibTeX export
 const main = document.getElementById('main');
-const TODAY = "2026-09-15";
+const TODAY = "2026-09-16";
 const SERVED = (location.hostname==='localhost'||location.hostname==='127.0.0.1');   // true ONLY on the serve_inbox localhost page; false on the claude.ai artifact preview or a file:// open
 const LSKEY = 'dp_draft_' + MODE + '_' + TODAY;        // per-digest local draft — survives reload/sleep; ONLY Submit uploads
 let dirty = false, everSubmitted = false, _saveT = null;
@@ -1096,7 +1097,7 @@ renderTaste();   // taste panel now lives inside Settings ▸ Your taste
 renderAccount(); // Account tab: passport (D1) + keyword constellation (D6)
 renderBalance(); // Experimental tab: Signal ⚖ Noise balance (D5)
 if(MODE==='nearmiss'){
-  document.querySelector('header .sub').textContent='2026-09-15 · papers the cutoff nearly surfaced — mark should-have vs correctly-dropped';
+  document.querySelector('header .sub').textContent='2026-09-16 · papers the cutoff nearly surfaced — mark should-have vs correctly-dropped';
   document.getElementById('count').textContent='0 judged';}
 paintRestored();   // reflect any restored local draft in the freshly-built DOM
 applyVis();        // apply persisted panel/section visibility
@@ -1149,8 +1150,8 @@ function nearLines(){const ts=new Date().toISOString();
 function dlNear(){const body=nearLines();
   if(!body){toast('Judge at least one paper first (should have / correctly dropped)'); return;}
   const blob=new Blob([body+'\n'],{type:'application/x-ndjson'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nearmiss_'+'2026-09-15'+'.jsonl'; a.click();
-  toast('Saved nearmiss_'+'2026-09-15'+'.jsonl — or use 📋 Copy to paste it to your assistant');}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nearmiss_'+'2026-09-16'+'.jsonl'; a.click();
+  toast('Saved nearmiss_'+'2026-09-16'+'.jsonl — or use 📋 Copy to paste it to your assistant');}
 function copyOut(){
   const t = MODE==='nearmiss' ? nearLines() : lines();
   if(!t){toast(MODE==='nearmiss'?'Judge at least one paper first':'Rate at least one paper first'); return;}
@@ -1166,8 +1167,8 @@ function lines(){const ts=new Date().toISOString();
     .map(p=>JSON.stringify({id:p.id,doi:p.doi,title:p.title,venue:p.venue,date:p.date,
     llm_score:p.score,tier:p.tier,interest:R[p.id].interest,match:R[p.id].match,note:(R[p.id].note||''),ts:ts})).join('\n');}
 function dl(){const blob=new Blob([lines()+'\n'],{type:'application/x-ndjson'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ratings_'+'2026-09-15'+'.jsonl'; a.click();
-  toast('Saved ratings_'+'2026-09-15'+'.jsonl — drop it in state/ and run apply_ratings.py');}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ratings_'+'2026-09-16'+'.jsonl'; a.click();
+  toast('Saved ratings_'+'2026-09-16'+'.jsonl — drop it in state/ and run apply_ratings.py');}
 function dedup(a){return Array.from(new Set(a));}
 function toggleSave(el){const i=+el.dataset.i, id=PAPERS[i].id;
   if(SAVED.has(id)) SAVED.delete(id); else SAVED.add(id);
@@ -1184,18 +1185,18 @@ function dlBib(){const items=PAPERS.filter(p=>SAVED.has(p.id));
   if(!items.length){toast('Star a paper (☆) to add it to the reading queue first'); return;}
   const bib=items.map(bibtex).join('\n\n');
   const blob=new Blob([bib+'\n'],{type:'application/x-bibtex'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='reading_queue_'+'2026-09-15'+'.bib'; a.click();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='reading_queue_'+'2026-09-16'+'.bib'; a.click();
   toast('Saved '+items.length+' entr'+(items.length>1?'ies':'y')+' — append to reading_queue.bib (apply_queue.py)');}
 function dlTaste(){
   if(nTaste()===0){toast('No taste edits yet — toggle a rule, add a keyword, or pin a note first'); return;}
-  const P={_kind:'taste-patch', ts:new Date().toISOString(), date:'2026-09-15',
+  const P={_kind:'taste-patch', ts:new Date().toISOString(), date:'2026-09-16',
     negatives:{add:PATCH.negatives.add, disable:dedup(PATCH.negatives.disable), enable:dedup(PATCH.negatives.enable)},
     profile:{pinned_notes:PATCH.profile.pinned_notes, themes:PATCH.profile.themes},
     pool:{enable:dedup(PATCH.pool.enable), disable:dedup(PATCH.pool.disable), add_keywords:dedup(PATCH.pool.add_keywords)},
     bank:{remove:dedup(PATCH.bank.remove), add:PATCH.bank.add}};
   const blob=new Blob([JSON.stringify(P,null,1)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='taste-patch_'+'2026-09-15'+'.json'; a.click();
-  toast('Saved taste-patch_'+'2026-09-15'+'.json — run: python3 src/apply_taste_patch.py <file>');}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='taste-patch_'+'2026-09-16'+'.json'; a.click();
+  toast('Saved taste-patch_'+'2026-09-16'+'.json — run: python3 src/apply_taste_patch.py <file>');}
 // ---------- submit (explicit — nothing uploads until you click) + local-draft paint ----------
 function stamp(){return new Date().toISOString().replace(/[-:T]/g,'').slice(0,15);}
 function tcountShow(){const e=document.getElementById('tcount'); if(e) e.textContent=nTaste()+' taste edits';}
