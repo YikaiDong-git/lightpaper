@@ -1071,8 +1071,10 @@ const VIEW={filter:'all', group:'tier', sort:'score', sortDir:'desc', page:0,
             density:(localStorage.getItem('dp_dense')==='1'?'compact':'comfy'), kw:null, search:'', datef:'30d', monStart:null, monEnd:null, minScore:8, maxScore:null};
 // folding moves records off the top level, so reducing over head dates alone can only make
 // _refDate older -- which would silently widen every relative date filter.
-const _refDate=PAPERS.reduce((m,p)=>{ let x=(p.date&&p.date>m)?p.date:m;
-  if(p.versions) p.versions.forEach(v=>{ if(v.date&&v.date>x) x=v.date; });
+// dates after the build day (journal issue dates, e.g. Aging Cell "2026-11-01" on 10-26) are left out: one such date
+// moved the reference a week ahead and emptied the 1-day / 7-day views
+const _refDate=PAPERS.reduce((m,p)=>{ let x=(p.date&&p.date>m&&p.date<=TODAY)?p.date:m;
+  if(p.versions) p.versions.forEach(v=>{ if(v.date&&v.date>x&&v.date<=TODAY) x=v.date; });
   return x; },'');
 // --- search-time by-month range picker (VIEW.datef==='mon' with VIEW.monStart/monEnd = 'YYYY-MM') ---
 const _MONNAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
